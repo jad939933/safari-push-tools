@@ -26,12 +26,6 @@ import org.json.JSONObject;
  */
 public class Packager {
     
-    /**
-     *
-     * @param authenticationToken
-     * @return
-     * @throws Exception
-     */
     static String getJSON(String authenticationToken) throws Exception {
         JSONObject obj = new JSONObject();
         obj.put("websiteName", "Jad Y.");
@@ -45,12 +39,6 @@ public class Packager {
         return obj.toString();
     }
 
-    /**
-     *
-     * @param authenticationToken
-     * @return
-     * @throws Exception
-     */
     static byte[] createPackageFile(String authenticationToken) throws Exception {
 
         System.out.println("packaging safari file with token: " + authenticationToken);
@@ -72,26 +60,17 @@ public class Packager {
 
         zip.addFile("", "website.json", getJSON(authenticationToken).getBytes());
 
-        byte[] manifest = zip.getManifest();
+        byte[] manifest = zip.manifest();
         zip.addFile("", "manifest.json", manifest);
-
-        byte signature[] = sign(manifest);
-
-        zip.addFile("", "signature", signature);
+ 
+        zip.addFile("", "signature", sign(manifest));
 
         return zip.getBytes();
 
     }
  
-
-    /**
-     *
-     * @param bytesToSign
-     * @return
-     * @throws Exception
-     */
     static byte[] sign(byte bytesToSign[]) throws Exception {
-        return new PKCS7Singer().sign(bytesToSign);
+        return new PKCS7Singer().sign(Config.get("cert-path"), Config.get("cert-passwd"), bytesToSign);
     }
 
     /**
